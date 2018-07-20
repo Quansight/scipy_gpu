@@ -15,7 +15,6 @@ cd xblas-1.0.248
 make lib
 cd ..
 
-f2py -m lapack lapack-3.8.0/SRC/*.f -h lapack380.pyf
-f2py -c lapack380.pyf -llapack -lrefblas -lxblas -Llapack-3.8.0 -Lxblas-1.0.248
-
+f2py -m lapack lapack-3.8.0/SRC/dgesv.f -h lapack.pyf
+f2py -c lapack.pyf -llapack -lrefblas -lxblas -lgfortran -Llapack-3.8.0 -Lxblas-1.0.248
 python test_lapack.py
