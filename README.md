@@ -4,8 +4,7 @@ SciPy-GPU aims at being a drop-in replacement for some SciPy functions that run 
 
 ## Installation
 
-In the `magma` directory:
-
 ```bash
+cd magma
 make
 ```
