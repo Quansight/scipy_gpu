@@ -3,7 +3,7 @@ all: flapack.pyf ../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/libre
 
 ../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/librefblas.a: lapack_to_magma.c
 	make -C ../lapack
-	cd ../lapack/lapack-3.8.0; bash ../../magma/lapack_to_magma.c.func
+	cd ../lapack/lapack-3.8.0; bash ../../magma/lapack_to_magma.sh
 
 flapack.pyf lapack_to_magma.c:
 	make -C ../f2py
@@ -19,7 +19,7 @@ magma-2.4.0/lib/libmagma.a: magma-2.4.0/make.inc
 	make -C magma-2.4.0 lib/libmagma.a
 
 lapack_to_magma.o: lapack_to_magma.c magma-2.4.0/make.inc
-	gcc -fopenmp -c lapack_to_magma.c -Imagma-2.4.0/include -I$(CUDADIR)/include -fPIC
+	gcc -fopenmp -c lapack_to_magma.c -Imagma-2.4.0/include -I$(CUDADIR)/include -D$(SCIPY_GPU_DEBUG) -fPIC
 
 liblapack_to_magma.a: lapack_to_magma.o
 	ar rcs liblapack_to_magma.a lapack_to_magma.o

@@ -241,17 +241,17 @@ def pyf2magma(fin, fout, ignore_func=[], magma_src=''):
             cwrap = '\n'.join(cwrap)
             cfile.append(cwrap)
     
-    with open(fout, 'wt') as f:
+    with open(f'{fout}.c', 'wt') as f:
         f.write('\n'.join(cfile))
 
-    with open(fout + '.func', 'wt') as f:
-        txt = 'ar dv liblapack.a '
+    with open(f'{fout}.sh', 'wt') as f:
+        txt = 'ar dv liblapack.a'
         for func in gpu_func:
-            txt += func + '.o '
+            txt += f' {func}.o'
         f.write(txt)
 
 if __name__ == '__main__':
-    cfname = 'lapack_to_magma.c'
+    cfname = 'lapack_to_magma'
     pyf2magma('flapack.pyf', cfname, ignore_func=['c...', 'z...'], magma_src='../magma/magma-2.4.0/src')
     #pyf2magma('flapack.pyf', cfname, magma_src='../magma/magma-2.4.0/src')
     print(f'Wrote file {cfname}')

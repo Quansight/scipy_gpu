@@ -20,13 +20,13 @@ Set some environment variables:
 And change the following paths according to the package versions you have installed:
 
 ```bash
-$ export LD_LIBRARY_PATH=$GFORTRANDIR/lib:$CONDADIR/pkgs/libgcc-ng-7.2.0-hdf63c60_3/lib:$CONDADIR/pkgs/cloog-0.18.0-0/lib:$CONDADIR/pkgs/isl-0.12.2-0/lib:$CUDADIR/lib64:$LD_LIBRARY_PATH
+$ export LD_LIBRARY_PATH=$CUDADIR/lib64:$CONDADIR/pkgs/libgcc-ng-7.2.0-hdf63c60_3/lib:$GFORTRANDIR/lib:$CONDADIR/pkgs/cloog-0.18.0-0/lib:$CONDADIR/pkgs/isl-0.12.2-0/lib:$LD_LIBRARY_PATH
 ```
 
-Then install with:
+Then install with (set `SCIPY_GPU_DEBUG` for debug information during run):
 
 ```bash
-$ make -C magma
+$ SCIPY_GPU_DEBUG=1 make -C magma
 ```
 
 You should now have some LAPACK functions executing through the MAGMA library. You should create a virtual environment in order to prevent linking with the LAPACK library which may ship with the Anaconda's distribution.
