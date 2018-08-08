@@ -245,7 +245,10 @@ def pyf2magma(fin, fout, ignore_func=[], magma_src=''):
         f.write('\n'.join(cfile))
 
     with open(fout + '.func', 'wt') as f:
-        f.write('ar dv liblapack.a ' + '.o '.join(gpu_func))
+        txt = 'ar dv liblapack.a '
+        for func in gpu_func:
+            txt += func + '.o '
+        f.write(txt)
 
 if __name__ == '__main__':
     cfname = 'lapack_to_magma.c'

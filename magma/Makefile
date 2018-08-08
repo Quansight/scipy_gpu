@@ -1,7 +1,7 @@
-all: flapack.pyf ../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/librefblas.a ../lapack/xblas-1.0.248/libxblas.a liblapack_to_magma.a magma-2.4.0/lib/libmagma.a
-	f2py -c flapack.pyf --f90flags='-fopenmp' -lgomp -llapack_to_magma -lmagma -llapack -lrefblas -lxblas -lgfortran -lcudart -lcublas -lcusparse -L$(PWD) -L$(GCCDIR)/lib -L$(CUDADIR)/lib64 -L$(PWD)/../lapack/lapack-3.8.0 -L$(PWD)/../lapack/xblas-1.0.248 -L$(PWD)/magma-2.4.0/lib
+all: flapack.pyf ../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/librefblas.a liblapack_to_magma.a magma-2.4.0/lib/libmagma.a
+	f2py -c flapack.pyf --f90flags='-fopenmp' -lgomp -llapack_to_magma -lmagma -llapack -lrefblas -lgfortran -lcudart -lcublas -lcusparse -L$(PWD) -L$(GCCDIR)/lib -L$(CUDADIR)/lib64 -L$(PWD)/../lapack/lapack-3.8.0 -L$(PWD)/magma-2.4.0/lib
 
-../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/librefblas.a ../lapack/xblas-1.0.248/libxblas.a: lapack_to_magma.c
+../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/librefblas.a: lapack_to_magma.c
 	make -C ../lapack
 	cd ../lapack/lapack-3.8.0; bash ../../magma/lapack_to_magma.c.func
 

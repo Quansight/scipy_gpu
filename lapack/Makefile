@@ -1,7 +1,7 @@
-all: lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a xblas-1.0.248/libxblas.a
+all: lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a
 
-test: test_lapack.py lapackmodule.c lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a xblas-1.0.248/libxblas.a
-	f2py -c lapack.pyf -llapack -lrefblas -lxblas -lgfortran -Llapack-3.8.0 -Lxblas-1.0.248
+test: test_lapack.py lapackmodule.c lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a
+	f2py -c lapack.pyf -llapack -lrefblas -lgfortran -Llapack-3.8.0
 	python test_lapack.py
 
 lapackmodule.c: lapack-3.8.0/make.inc lapack.pyf
@@ -20,15 +20,5 @@ lapack-3.8.0/liblapack.a: lapack-3.8.0/make.inc
 lapack-3.8.0/librefblas.a: lapack-3.8.0/make.inc
 	make -C lapack-3.8.0 blaslib
 
-xblas.tar.gz:
-	wget http://www.netlib.org/xblas/xblas.tar.gz
-
-xblas-1.0.248/make.inc: xblas.tar.gz
-	tar zxf xblas.tar.gz
-	cp make.inc.xblas xblas-1.0.248/make.inc
-
-xblas-1.0.248/libxblas.a: xblas-1.0.248/make.inc
-	make -C xblas-1.0.248 lib
-
 clean:
-	rm -f lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a xblas-1.0.248/libxblas.a
+	rm -f lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a
