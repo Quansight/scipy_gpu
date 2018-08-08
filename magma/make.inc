@@ -62,10 +62,9 @@ LIB      += -lcublas -lcusparse -lcudart -lcudadevrt
 # directories
 
 # define library directories preferably in your environment, or here.
-CUDADIR = /usr/lib/x86_64-linux-gnu
 -include make.check-cuda
 
-LIBDIR    = -L/usr/lib/x86_64-linux-gnu \
+LIBDIR    = -L$(CUDADIR)/lib64 -L$(GCCDIR)/lib \
             -L../../lapack/lapack-3.8.0 -L../../lapack/xblas-1.0.248
 
-INC       = -I/usr/include
+INC       = -I$(CUDADIR)/include

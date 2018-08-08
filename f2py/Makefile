@@ -1,6 +1,7 @@
 all: lapack_to_magma.c
 	cp flapack.pyf ../magma
 	cp lapack_to_magma.c ../magma
+	cp lapack_to_magma.c.func ../magma
 
 flapack.pyf: setup.py
 	python setup.py build_src

@@ -82,12 +82,16 @@ def pyf2magma(fin, fout, ignore_func=[], magma_src=''):
     cfile = []
     cfile.append('#include <cuda.h>')
     cfile.append('#include "magma_v2.h"')
+    cfile.append('#ifdef SCIPY_GPU_DEBUG')
+    cfile.append('#include <stdio.h>')
+    cfile.append('#endif')
     cfile.append('typedef struct {float r,i;} complex_float;')
     cfile.append('typedef struct {double r,i;} complex_double;')
     # function parameter names are inferred from calling arguments
     # when same argument is passed, corresponding parameter name is uniquified
     # `param_aliases` maps the uniquified parameters to the calling arguments
     param_aliases = {}
+    gpu_func = []
     for func in blocks[0]['body'][0]['body']:
         #pprint(func)
         name = func['name']
@@ -105,6 +109,7 @@ def pyf2magma(fin, fout, ignore_func=[], magma_src=''):
                     ignore = True
         if (not ignore) and (name in magma_impl):
             print(name)
+            gpu_func.append(name)
             types = func['f2pyenhancements']['callprotoargument'].split(',')
             params = get_call_args(func['f2pyenhancements']['callstatement'])
             # duplicate arguments are uniquified by appending '_'
@@ -149,6 +154,9 @@ def pyf2magma(fin, fout, ignore_func=[], magma_src=''):
             proto.append(', '.join([f'{t} {p}' for t, p in zip(types, params)]))
             proto.append(') {')
             cwrap.append(''.join(proto))
+            cwrap.append('#ifdef SCIPY_GPU_DEBUG')
+            cwrap.append(f'    fprintf(stderr, "GPU {name}\\n");')
+            cwrap.append('#endif')
             cwrap.append('    magma_init();')
             cwrap.append('    magma_queue_t queue = NULL;')
             cwrap.append('    magma_int_t dev = 0;')
@@ -235,6 +243,9 @@ def pyf2magma(fin, fout, ignore_func=[], magma_src=''):
     
     with open(fout, 'wt') as f:
         f.write('\n'.join(cfile))
+
+    with open(fout + '.func', 'wt') as f:
+        f.write('ar dv liblapack.a ' + '.o '.join(gpu_func))
 
 if __name__ == '__main__':
     cfname = 'lapack_to_magma.c'
