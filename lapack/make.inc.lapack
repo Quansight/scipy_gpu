@@ -19,7 +19,7 @@ CFLAGS = -O3
 #  and handle these quantities appropriately. As a consequence, one
 #  should not compile LAPACK with flags such as -ffpe-trap=overflow.
 #
-FORTRAN = gfortran
+FORTRAN = $(GFORTRANDIR)/bin/gfortran
 OPTS    = -O2 -frecursive -fPIC
 DRVOPTS = $(OPTS)
 NOOPT   = -O0 -frecursive -fPIC
@@ -27,7 +27,7 @@ NOOPT   = -O0 -frecursive -fPIC
 #  Define LOADER and LOADOPTS to refer to the loader and desired
 #  load options for your machine.
 #
-LOADER   = gfortran
+LOADER   = $(GFORTRANDIR)/bin/gfortran
 LOADOPTS =
 
 #  The archiver and the flag(s) to use when building an archive
@@ -71,8 +71,8 @@ TIMER = INT_ETIME
 #  relevant routines will be compiled and XBLAS will be linked only
 #  if USEXBLAS is defined.
 
-USEXBLAS = Yes
-XBLASLIB = -lxblas
+#USEXBLAS = Yes
+#XBLASLIB = -lxblas
 
 #  The location of the libraries to which you will link.  (The
 #  machine-specific, optimized BLAS library should be used whenever

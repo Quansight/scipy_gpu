@@ -25,7 +25,7 @@
 CC        = gcc
 CXX       = g++
 NVCC      = nvcc
-FORT      = gfortran
+FORT      = $(GFORTRANDIR)/bin/gfortran
 
 ARCH      = ar
 ARCHFLAGS = cr
@@ -64,7 +64,7 @@ LIB      += -lcublas -lcusparse -lcudart -lcudadevrt
 # define library directories preferably in your environment, or here.
 -include make.check-cuda
 
-LIBDIR    = -L$(CUDADIR)/lib64 -L$(GCCDIR)/lib \
+LIBDIR    = -L$(CUDADIR)/lib64 -L$(GFORTRANDIR)/lib \
             -L../../lapack/lapack-3.8.0 -L../../lapack/xblas-1.0.248
 
 INC       = -I$(CUDADIR)/include
