@@ -1,5 +1,5 @@
 all: flapack.pyf ../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/librefblas.a liblapack_to_magma.a magma-2.4.0/lib/libmagma.a
-	f2py -c flapack.pyf --f90flags='-fopenmp' -lgomp -llapack_to_magma -lmagma -llapack -lrefblas -lgfortran -lcudart -lcublas -lcusparse -L$(PWD) -L$(GFORTRANDIR)/lib -L$(CUDADIR)/lib64 -L$(PWD)/../lapack/lapack-3.8.0 -L$(PWD)/magma-2.4.0/lib
+	f2py -c flapack.pyf --f90flags='-fopenmp' -lgomp -llapack_to_magma -lmagma -llapack -lrefblas -lgfortran -lcudart -lcublas -lcusparse -L. -L$(GFORTRANDIR)/lib -L$(CUDADIR)/lib64 -L../lapack/lapack-3.8.0 -Lmagma-2.4.0/lib
 
 ../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/librefblas.a: lapack_to_magma.c
 	make -C ../lapack
