@@ -1,3 +1,11 @@
+ifeq ($(SCIPY_GPU_DEBUG),TRUE)
+	DEFINE_SCIPY_GPU_DEBUG=-DSCIPY_GPU_DEBUG
+else
+	DEFINE_SCIPY_GPU_DEBUG=
+endif
+
+
+
 all: flapack.pyf ../lapack/lapack-3.8.0/liblapack.a ../lapack/lapack-3.8.0/librefblas.a liblapack_to_magma.a magma-2.4.0/lib/libmagma.a
 	f2py -c flapack.pyf --f90flags='-fopenmp' -lgomp -llapack_to_magma -lmagma -llapack -lrefblas -lgfortran -lcudart -lcublas -lcusparse -L. -L$(GFORTRANDIR)/lib -L$(CUDADIR)/lib64 -L../lapack/lapack-3.8.0 -Lmagma-2.4.0/lib
 
@@ -19,7 +27,7 @@ magma-2.4.0/lib/libmagma.a: magma-2.4.0/make.inc
 	make -C magma-2.4.0 lib/libmagma.a
 
 lapack_to_magma.o: lapack_to_magma.c magma-2.4.0/make.inc
-	gcc -fopenmp -c lapack_to_magma.c -Imagma-2.4.0/include -I$(CUDADIR)/include -D$(SCIPY_GPU_DEBUG) -fPIC
+	gcc -fopenmp -c lapack_to_magma.c -Imagma-2.4.0/include -I$(CUDADIR)/include $(DEFINE_SCIPY_GPU_DEBUG) -fPIC
 
 liblapack_to_magma.a: lapack_to_magma.o
 	ar rcs liblapack_to_magma.a lapack_to_magma.o

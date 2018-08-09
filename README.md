@@ -26,7 +26,7 @@ $ export LD_LIBRARY_PATH=$CUDADIR/lib64:$CONDADIR/pkgs/libgcc-ng-7.2.0-hdf63c60_
 Then install with (set `SCIPY_GPU_DEBUG` for debug information during run):
 
 ```bash
-$ SCIPY_GPU_DEBUG=1 make -C magma
+$ SCIPY_GPU_DEBUG=TRUE make -C magma
 ```
 
 You should now have some LAPACK functions executing through the MAGMA library. You should create a virtual environment in order to prevent linking with the LAPACK library which may ship with the Anaconda's distribution.
