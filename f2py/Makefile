@@ -3,7 +3,7 @@ all: lapack_to_magma.c
 	cp lapack_to_magma.c ../magma
 	cp lapack_to_magma.sh ../magma
 
-flapack.pyf: setup.py
+flapack.pyf: setup.py flapack_gen.pyf.src
 	python setup.py build_src
 	cp build/src.linux-x86_64-3.6/flapack.pyf .
 

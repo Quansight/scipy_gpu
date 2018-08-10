@@ -1,7 +1,7 @@
 all: lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a
 
 test: test_lapack.py lapackmodule.c lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a
-	f2py -c lapack.pyf -llapack -lrefblas -lgfortran -Llapack-3.8.0
+	f2py -c lapack.pyf -llapack -lrefblas -lgfortran -Llapack-3.8.0 -L$(GFORTRANDIR)/lib
 	python test_lapack.py
 
 lapackmodule.c: lapack-3.8.0/make.inc lapack.pyf
@@ -12,7 +12,7 @@ lapack-3.8.0.tar.gz:
 
 lapack-3.8.0/make.inc: lapack-3.8.0.tar.gz
 	tar zxf lapack-3.8.0.tar.gz
-	cp make.inc.lapack lapack-3.8.0/make.inc
+	cp make.inc lapack-3.8.0
 
 lapack-3.8.0/liblapack.a: lapack-3.8.0/make.inc
 	make -C lapack-3.8.0 lapacklib
@@ -21,4 +21,4 @@ lapack-3.8.0/librefblas.a: lapack-3.8.0/make.inc
 	make -C lapack-3.8.0 blaslib
 
 clean:
-	rm -f lapack-3.8.0/liblapack.a lapack-3.8.0/librefblas.a
+	rm -f lapack-3.8.0/*.a *.so

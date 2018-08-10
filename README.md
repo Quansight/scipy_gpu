@@ -23,13 +23,15 @@ And change the following paths according to the package versions you have instal
 $ export LD_LIBRARY_PATH=$CUDADIR/lib64:$CONDADIR/pkgs/libgcc-ng-7.2.0-hdf63c60_3/lib:$GFORTRANDIR/lib:$CONDADIR/pkgs/cloog-0.18.0-0/lib:$CONDADIR/pkgs/isl-0.12.2-0/lib:$LD_LIBRARY_PATH
 ```
 
-Then install with (set `SCIPY_GPU_DEBUG` for debug information during run):
+You should create a virtual environment in order to prevent linking with the LAPACK library which may ship with Anaconda's distribution.
+
+Then install with (set `SCIPY_GPU_DEBUG` for debug information during run, at least to make sure you run on the GPU!):
 
 ```bash
 $ SCIPY_GPU_DEBUG=TRUE make -C magma
 ```
 
-You should now have some LAPACK functions executing through the MAGMA library. You should create a virtual environment in order to prevent linking with the LAPACK library which may ship with the Anaconda's distribution.
+You should now have some LAPACK functions executing through the MAGMA library.
 
 ```python
 import numpy as np

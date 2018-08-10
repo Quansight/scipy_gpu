@@ -1,0 +1,20 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module lapack ! in 
+    interface  ! in :lapack
+        subroutine dgesv(n,nrhs,a,lda,ipiv,b,ldb,info) ! in :lapack:lapack-3.8.0/SRC/dgesv.f
+            integer :: n
+            integer :: nrhs
+            double precision dimension(lda,*) :: a
+            integer, optional,check(shape(a,0)==lda),depend(a) :: lda=shape(a,0)
+            integer dimension(*) :: ipiv
+            double precision dimension(ldb,*) :: b
+            integer, optional,check(shape(b,0)==ldb),depend(b) :: ldb=shape(b,0)
+            integer :: info
+        end subroutine dgesv
+    end interface 
+end python module lapack
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/
