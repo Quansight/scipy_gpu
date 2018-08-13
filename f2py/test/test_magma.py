@@ -1,5 +1,5 @@
 import numpy as np
-import _flapack as lp
+import magma as lp
 
 # Solve a system of linear equations A*x=b
 A = np.array([[1, 2], [3, 4]])

@@ -95,7 +95,7 @@ def pyf2magma(fin, fout, magma_src, ignore_func=[]):
                 margs.append(ma)
             margs = ', '.join(margs)
             cwrap.append(f'    magma_{name}({margs});')
-            cwrap.append('    magma_finalize;')
+            cwrap.append('    magma_finalize();')
             cwrap.append('}')
             cwrap = '\n'.join(cwrap)
             cfile.append(cwrap)
@@ -112,4 +112,4 @@ def pyf2magma(fin, fout, magma_src, ignore_func=[]):
 if __name__ == '__main__':
     cfname = 'lapack_to_magma'
     pyf2magma('flapack.pyf', cfname, '../magma/magma-2.4.0/src', ignore_func=['c*', 'z*'])
-    print(f'Wrote file {cfname}')
+    print(f'Wrote file {cfname}.c')
