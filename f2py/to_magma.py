@@ -27,7 +27,7 @@ def get_magma_types(magma_src, fname):
         names.append(n)
     return types, names
 
-def to_magma(fin, module, magma_src, ignore_func):
+def to_magma(fin, module, magma_src, ignore_func=[]):
     if magma_src:
         magma_impl = [f[:-4] for f in os.listdir(magma_src) if f.endswith('.cpp')]
     else:
@@ -41,6 +41,8 @@ def to_magma(fin, module, magma_src, ignore_func):
     cfile.append('#ifdef SCIPY_GPU_DEBUG')
     cfile.append('#include <stdio.h>')
     cfile.append('#endif')
+    cfile.append('typedef struct {float r,i;} complex_float;')
+    cfile.append('typedef struct {double r,i;} complex_double;')
     for func in blocks[0]['body'][0]['body']:
         name = func['name']
         ignore = False
@@ -102,12 +104,18 @@ def to_magma(fin, module, magma_src, ignore_func):
         clines = f.readlines()
     
     new_clines = []
+    first_extern = True
+    s0 = 'extern void F_FUNC('
+    s1 = 'F_FUNC('
     for l in clines:
         line_done = False
         if not line_done:
-            s = 'extern void F_FUNC('
-            if (s in l) and not l.startswith('/*'):
-                i0 = l.find(s) + len(s)
+            if (s0 in l) and not l.startswith('/*'):
+                if first_extern:
+                    first_extern = False
+                    new_clines.append('extern void magma_init();\n')
+                    new_clines.append('extern void magma_finalize();\n')
+                i0 = l.find(s0) + len(s0)
                 i1 = l.find(',')
                 name = l[i0:i1]
                 i2 = l.find(')')
@@ -116,10 +124,9 @@ def to_magma(fin, module, magma_src, ignore_func):
                     new_l = f'extern void _magma_{name}' + l[i2+1:]
                     new_clines.append(new_l)
         if not line_done:
-            s = 'F_FUNC('
-            if (s in l) and ('f2py_init_func') in l:
-                i0 = l.find(s)
-                i1 = i0 + len(s)
+            if (s1 in l) and ('f2py_init_func') in l:
+                i0 = l.find(s1)
+                i1 = i0 + len(s1)
                 i2 = l[i1:].find(',') + i1
                 name = l[i1:i2]
                 i3 = l[i1:].find(')') + i1
@@ -128,13 +135,16 @@ def to_magma(fin, module, magma_src, ignore_func):
                     new_l = l[:i0] + f'_magma_{name}' + l[i3+1:]
                     new_clines.append(new_l)
         if not line_done:
-            s = 'import_array'
-            if s in l:
-                line_done = True
-                new_l = l + ' magma_init();'
-                new_clines.append(new_l)
-        if not line_done:
             new_clines.append(l)
+
+    i = len(new_clines)
+    done = False
+    while not done:
+        i -= 1
+        if 'return RETVAL;' in new_clines[i]:
+            new_clines.insert(i, '  magma_init();')
+            new_clines.insert(i, '  on_exit(magma_finalize,(void*)"_flapack");')
+            done = True
     
     with open(module, 'wt') as f:
         f.write(''.join(new_clines))

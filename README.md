@@ -28,21 +28,35 @@ You should create a virtual environment in order to prevent linking with the LAP
 Then install with:
 
 ```bash
-$ SCIPY_GPU_DEBUG=TRUE make -C f2py
+$ make -C f2py
 ```
 
 You should now have some LAPACK functions executing through the MAGMA library.
 
 ```python
 import numpy as np
-import _flapack as lp
+import _flapack as mm               # MAGMA
+import scipy.linalg.lapack as lp    # LAPACK
+from time import time
 
-# Solve a system of linear equations A*x=b
-A = np.array([[1, 2], [3, 4]])
-b = np.array([[5], [6]], dtype=np.float64, order='F')
-print(lp.dgesv(A, b))
-# see https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.linalg.lapack.dgesv.html
-# x should be:
-# array([[-4. ],
-#        [ 4.5]])
+m = 8192
+n = 100
+a = np.random.uniform(size=m*m).astype(np.float32, order='F').reshape((m, m))
+b = np.random.uniform(size=m*n).astype(np.float32, order='F').reshape((m, n))
+
+# sgesv solves a system of linear equations a*x=b
+# see https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lapack.sgesv.html
+
+t0 = time()
+mm.sgesv(a, b)
+t1 = time()
+print('GPU time:', t1 - t0)
+
+t0 = time()
+lp.sgesv(a, b)
+t1 = time()
+print('CPU time:', t1 - t0)
+
+# GPU time: 1.9766342639923096
+# CPU time: 5.190711736679077
 ```
