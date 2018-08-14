@@ -58,19 +58,24 @@ def to_magma(fin, module, magma_src, ignore_func=[]):
             if startswith:
                 if name.startswith(func_name):
                     ignore = True
+                    print(f'{name} ignored because starts with {func_name}')
             if endswith:
                 if name.endswith(func_name):
                     ignore = True
+                    print(f'{name} ignored because ends with {func_name}')
             if name == func_name:
                 ignore = True
+                print(f'{name} ignored because equals {func_name}')
         if name not in magma_impl:
             ignore = True
+            print(f'{name} ignored because not found in MAGMA')
         if not ignore:
             types = func['f2pyenhancements']['callprotoargument'].split(',')
             magma_types, params = get_magma_types(magma_src, name)
             if len(types) != len(magma_types):
                 # not the same number of parameters, ignore this function
                 ignore = True
+                print(f'{name} ignored because parameters between LAPACK and MAGMA mismatch')
         if ignore:
             ignores.append(name)
         else:
@@ -142,8 +147,8 @@ def to_magma(fin, module, magma_src, ignore_func=[]):
     while not done:
         i -= 1
         if 'return RETVAL;' in new_clines[i]:
-            new_clines.insert(i, '  magma_init();')
-            new_clines.insert(i, '  on_exit(magma_finalize,(void*)"_flapack");')
+            new_clines.insert(i, '  magma_init();\n')
+            new_clines.insert(i, '  on_exit(magma_finalize,(void*)"_flapack");\n')
             done = True
     
     with open(module, 'wt') as f:
