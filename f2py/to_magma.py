@@ -10,22 +10,37 @@ def get_magma_types(magma_src, fname):
     params = txt[i0:i1].split(',')
     types = []
     names = []
+    convs = []
     for param in params:
         p = param.split()
         t = p[0]
         n = p[1]
+        c = ''
         if t == 'magma_int_t':
             t = 'int'
         elif t == 'magmaFloat_ptr':
             t = 'float*'
         elif t == 'magmaDouble_ptr':
             t = 'double*'
+        elif t == 'magma_uplo_t':
+            t = 'char'
+            v = f'_magma_{n}_'
+            c = f"magma_uplo_t {v}; switch (*{n}) {{ case 'U': {v} = MagmaUpper; break; case 'L': {v} = MagmaLower; break; default: break; }}"
+        elif t == 'magma_trans_t':
+            t = 'char'
+            v = f'_magma_{n}_'
+            c = f"magma_trans_t {v}; switch (*{n}) {{ case 'N': {v} = MagmaNoTrans; break; case 'T': {v} = MagmaTrans; break; default: break; }}"
+        elif t == 'magma_vec_t':
+            t = 'char'
+            v = f'_magma_{n}_'
+            c = f"magma_vec_t {v}; switch (*{n}) {{ case 'N': {v} = MagmaNoVec; break; case 'V': {v} = MagmaVec; break; default: break; }}"
         if n.startswith('*'):
             t += '*'
             n = n[1:]
         types.append(t)
         names.append(n)
-    return types, names
+        convs.append(c)
+    return types, names, convs
 
 def to_magma(fin, module, magma_src, ignore_func=[]):
     if magma_src:
@@ -71,7 +86,7 @@ def to_magma(fin, module, magma_src, ignore_func=[]):
             print(f'{name} ignored because not found in MAGMA')
         if not ignore:
             types = func['f2pyenhancements']['callprotoargument'].split(',')
-            magma_types, params = get_magma_types(magma_src, name)
+            magma_types, params, convs = get_magma_types(magma_src, name)
             if len(types) != len(magma_types):
                 # not the same number of parameters, ignore this function
                 ignore = True
@@ -87,16 +102,29 @@ def to_magma(fin, module, magma_src, ignore_func=[]):
             cwrap.append(''.join(proto))
             cwrap.append('#ifdef SCIPY_GPU_DEBUG')
             cwrap.append(f'    fprintf(stderr, "GPU {name}\\n");')
+            for p, t in zip(params, types):
+                pt = {'char*': 'c', 'int*': 'd'}.get(t, None)
+                if pt:
+                    cwrap.append(f'    fprintf(stderr, "{p}=%{pt}\\n", *{p});')
             cwrap.append('#endif')
             # MAGMA function call
             margs = []
-            for p, t, mt in zip(params, types, magma_types):
-                if t == mt:
+            for p, t, mt, c in zip(params, types, magma_types, convs):
+                if c:
+                    ma = f'_magma_{p}_'
+                    cwrap.append(f'    {c}')
+                elif t == mt:
                     ma = p
                 else:
                     ma = f'*{p}'
                 margs.append(ma)
             margs = ', '.join(margs)
+            cwrap.append('#ifdef SCIPY_GPU_DEBUG')
+            for p, t, mt, c in zip(params, types, magma_types, convs):
+                pt = {'char*': 'c', 'int*': 'd'}.get(t, None)
+                if pt:
+                    cwrap.append(f'    fprintf(stderr, "{p}=%{pt}", {p}\\n);')
+            cwrap.append('#endif')
             cwrap.append(f'    magma_{name}({margs});')
             cwrap.append('}')
             cwrap = '\n'.join(cwrap)

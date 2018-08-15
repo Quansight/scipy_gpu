@@ -2,6 +2,7 @@ import numpy as np
 from pandas import DataFrame
 import _flapack as mm               # MAGMA
 import scipy.linalg.lapack as lp    # LAPACK
+import scipy.linalg.blas as bl      # BLAS
 from time import time
 
 def get_dtype(funcname):
@@ -22,6 +23,7 @@ def get_time(funcname, args, df, keep_result=False):
         t = t1 - t0
         df[funcname][target] = t
         if keep_result:
+            # keep the CPU result
             df[funcname]['ret'] = ret
         print(target, t)
     print()
@@ -61,7 +63,7 @@ for prefix in ['s', 'd']:
 
 func = 'getrs'
 
-for prefix in ['s', 'd']:
+for prefix in []:#['s', 'd']:
     funcname = prefix + func
     dtype = get_dtype(funcname)
     
@@ -76,13 +78,98 @@ for prefix in ['s', 'd']:
 
 func = 'getri'
 
-for prefix in ['s', 'd']:
+for prefix in []:#['s', 'd']:
     funcname = prefix + func
     dtype = get_dtype(funcname)
     
     lu, piv, info = df[prefix + 'getrf']['ret']
     
     get_time(funcname, (lu, piv), df)
+
+################################################################################
+
+func = 'posv'
+
+for prefix in []:#['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    m = 8192
+    n = 100
+    a = np.random.uniform(size=m*m).astype(dtype, order='F').reshape((m, m))
+    b = np.ones((m, n), dtype=dtype, order='F')
+    alpha = 1.
+    c = bl.sgemm(alpha, a, b)
+
+    get_time(funcname, (a, c), df)
+
+################################################################################
+
+func = 'potrf'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+    
+    m = 8192
+    a = np.random.uniform(size=m*m).astype(dtype, order='F').reshape((m, m))
+
+    get_time(funcname, (a, ), df, keep_result=True)
+
+################################################################################
+
+func = 'potri'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+    
+    c, info = df[prefix + 'potrf']['ret']
+
+    get_time(funcname, (c, ), df)
+
+################################################################################
+
+func = 'gels'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+    
+    m = 8192
+    n = 8192
+    nrhs = 100
+    a = np.random.uniform(size=m*n).astype(dtype, order='F').reshape((m, n))
+    b = np.random.uniform(size=m*nrhs).astype(dtype, order='F').reshape((m, nrhs))
+
+    get_time(funcname, (a, b), df)
+
+################################################################################
+
+func = 'geqrf'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+    
+    m = 4096
+    n = 4096
+    a = np.random.uniform(size=m*n).astype(dtype, order='F').reshape((m, n))
+
+    get_time(funcname, (a, ), df)
+
+################################################################################
+
+func = 'geev'
+
+for prefix in []:#['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+    
+    n = 1024
+    a = np.random.uniform(size=n*n).astype(dtype, order='F').reshape((n, n))
+
+    get_time(funcname, (a, ), df)
 
 
 

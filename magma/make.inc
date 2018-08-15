@@ -53,7 +53,7 @@ CFLAGS   += -std=c99
 # --------------------
 # libraries
 
-LIB       = -llapack -lrefblas -lxblas -lgfortran
+LIB       = -llapack -lrefblas -lgfortran
 
 LIB      += -lcublas -lcusparse -lcudart -lcudadevrt
 
@@ -65,6 +65,6 @@ LIB      += -lcublas -lcusparse -lcudart -lcudadevrt
 -include make.check-cuda
 
 LIBDIR    = -L$(CUDADIR)/lib64 -L$(GFORTRANDIR)/lib \
-            -L../../lapack/lapack-3.8.0 -L../../lapack/xblas-1.0.248
+            -L../../lapack/lapack-3.8.0
 
 INC       = -I$(CUDADIR)/include
