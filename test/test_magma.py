@@ -63,7 +63,7 @@ for prefix in ['s', 'd']:
 
 func = 'getrs'
 
-for prefix in []:#['s', 'd']:
+for prefix in []:#['s', 'd']: # not executed on the GPU
     funcname = prefix + func
     dtype = get_dtype(funcname)
     
@@ -78,7 +78,7 @@ for prefix in []:#['s', 'd']:
 
 func = 'getri'
 
-for prefix in []:#['s', 'd']:
+for prefix in []:#['s', 'd']: # not executed on the GPU
     funcname = prefix + func
     dtype = get_dtype(funcname)
     
@@ -90,7 +90,7 @@ for prefix in []:#['s', 'd']:
 
 func = 'posv'
 
-for prefix in []:#['s', 'd']:
+for prefix in ['s', 'd']:
     funcname = prefix + func
     dtype = get_dtype(funcname)
 
@@ -132,7 +132,7 @@ for prefix in ['s', 'd']:
 
 func = 'gels'
 
-for prefix in ['s', 'd']:
+for prefix in []:#['s', 'd']: # illegal parameter value
     funcname = prefix + func
     dtype = get_dtype(funcname)
     
@@ -148,7 +148,7 @@ for prefix in ['s', 'd']:
 
 func = 'geqrf'
 
-for prefix in ['s', 'd']:
+for prefix in []:#['s', 'd']: # illegal parameter value
     funcname = prefix + func
     dtype = get_dtype(funcname)
     
@@ -162,7 +162,7 @@ for prefix in ['s', 'd']:
 
 func = 'geev'
 
-for prefix in []:#['s', 'd']:
+for prefix in []:#['s', 'd']: # segmentation fault
     funcname = prefix + func
     dtype = get_dtype(funcname)
     

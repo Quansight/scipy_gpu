@@ -119,12 +119,6 @@ def to_magma(fin, module, magma_src, ignore_func=[]):
                     ma = f'*{p}'
                 margs.append(ma)
             margs = ', '.join(margs)
-            cwrap.append('#ifdef SCIPY_GPU_DEBUG')
-            for p, t, mt, c in zip(params, types, magma_types, convs):
-                pt = {'char*': 'c', 'int*': 'd'}.get(t, None)
-                if pt:
-                    cwrap.append(f'    fprintf(stderr, "{p}=%{pt}", {p}\\n);')
-            cwrap.append('#endif')
             cwrap.append(f'    magma_{name}({margs});')
             cwrap.append('}')
             cwrap = '\n'.join(cwrap)
