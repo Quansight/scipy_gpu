@@ -20,7 +20,7 @@ to_magma.c: build/src.linux-x86_64-3.6/build/src.linux-x86_64-3.6/_flapackmodule
 	python to_magma.py
 
 to_magma.o: to_magma.c
-	gcc -c to_magma.c -I../magma/magma-2.4.0/include -I$(CUDADIR)/include $(DEFINE_SCIPY_GPU_DEBUG) $(DEFINE_SCIPY_GPU_DEBUG) -fPIC
+	gcc -c to_magma.c -I../magma/magma-2.4.0/include -I$(CUDADIR)/include $(DEFINE_SCIPY_GPU_DEBUG) -fPIC
 
 libto_magma.a: to_magma.o
 	ar rcs libto_magma.a to_magma.o

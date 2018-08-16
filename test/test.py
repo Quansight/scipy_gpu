@@ -40,8 +40,8 @@ for prefix in ['s', 'd']:
     
     m = 8192
     n = 100
-    a = np.random.uniform(size=m*m).astype(dtype, order='F').reshape((m, m))
-    b = np.random.uniform(size=m*n).astype(dtype, order='F').reshape((m, n))
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype, order='F')
+    b = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype, order='F')
     
     get_time(funcname, (a, b), df)
 
@@ -55,7 +55,7 @@ for prefix in ['s', 'd']:
     
     m = 8192
     n = 8192
-    a = np.random.uniform(size=m*n).astype(dtype, order='F').reshape((m, n))
+    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype, order='F')
     
     get_time(funcname, (a, ), df, keep_result=True)
 
@@ -96,10 +96,13 @@ for prefix in ['s', 'd']:
 
     m = 8192
     n = 100
-    a = np.random.uniform(size=m*m).astype(dtype, order='F').reshape((m, m))
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype, order='F')
     b = np.ones((m, n), dtype=dtype, order='F')
     alpha = 1.
-    c = bl.sgemm(alpha, a, b)
+    if dtype == np.float32:
+        c = bl.sgemm(alpha, a, b)
+    elif dtype == np.float64:
+        c = bl.dgemm(alpha, a, b)
 
     get_time(funcname, (a, c), df)
 
@@ -112,7 +115,7 @@ for prefix in ['s', 'd']:
     dtype = get_dtype(funcname)
     
     m = 8192
-    a = np.random.uniform(size=m*m).astype(dtype, order='F').reshape((m, m))
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype, order='F')
 
     get_time(funcname, (a, ), df, keep_result=True)
 
@@ -139,8 +142,8 @@ for prefix in []:#['s', 'd']: # illegal parameter value
     m = 8192
     n = 8192
     nrhs = 100
-    a = np.random.uniform(size=m*n).astype(dtype, order='F').reshape((m, n))
-    b = np.random.uniform(size=m*nrhs).astype(dtype, order='F').reshape((m, nrhs))
+    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype, order='F')
+    b = np.random.uniform(size=m*nrhs).reshape((m, nrhs)).astype(dtype, order='F')
 
     get_time(funcname, (a, b), df)
 
@@ -154,7 +157,7 @@ for prefix in []:#['s', 'd']: # illegal parameter value
     
     m = 4096
     n = 4096
-    a = np.random.uniform(size=m*n).astype(dtype, order='F').reshape((m, n))
+    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype, order='F')
 
     get_time(funcname, (a, ), df)
 
@@ -167,7 +170,7 @@ for prefix in []:#['s', 'd']: # segmentation fault
     dtype = get_dtype(funcname)
     
     n = 1024
-    a = np.random.uniform(size=n*n).astype(dtype, order='F').reshape((n, n))
+    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype, order='F')
 
     get_time(funcname, (a, ), df)
 
