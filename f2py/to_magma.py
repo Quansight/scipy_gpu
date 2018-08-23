@@ -25,15 +25,15 @@ def get_magma_types(magma_src, fname):
         elif t == 'magma_uplo_t':
             t = 'char'
             v = f'_magma_{n}_'
-            c = f"magma_uplo_t {v}; switch (*{n}) {{ case 'U': {v} = MagmaUpper; break; case 'L': {v} = MagmaLower; break; default: break; }}"
+            c = f"magma_uplo_t {v}; switch (*{n}) {{ case 'U': {v} = MagmaUpper; break; case 'L': {v} = MagmaLower; break; default: fprintf(stderr, \"magma_uplo_t doesn't map all LAPACK possible character values.\"); exit(EXIT_FAILURE); break; }}"
         elif t == 'magma_trans_t':
             t = 'char'
             v = f'_magma_{n}_'
-            c = f"magma_trans_t {v}; switch (*{n}) {{ case 'N': {v} = MagmaNoTrans; break; case 'T': {v} = MagmaTrans; break; default: break; }}"
+            c = f"magma_trans_t {v}; switch (*{n}) {{ case 'N': {v} = MagmaNoTrans; break; case 'T': {v} = MagmaTrans; break; default: fprintf(stderr, \"magma_trans_t doesn't map all LAPACK possible character values.\"); exit(EXIT_FAILURE); break; }}"
         elif t == 'magma_vec_t':
             t = 'char'
             v = f'_magma_{n}_'
-            c = f"magma_vec_t {v}; switch (*{n}) {{ case 'N': {v} = MagmaNoVec; break; case 'V': {v} = MagmaVec; break; default: break; }}"
+            c = f"magma_vec_t {v}; switch (*{n}) {{ case 'N': {v} = MagmaNoVec; break; case 'V': {v} = MagmaVec; break; case 'O': {v} = MagmaOverwriteVec; break; case 'A': {v} = MagmaAllVec; break; case 'S': {v} = MagmaSomeVec; break; default: fprintf(stderr, \"magma_vec_t doesn't map all LAPACK possible character values.\"); exit(EXIT_FAILURE); break; }}"
         if n.startswith('*'):
             t += '*'
             n = n[1:]
@@ -53,9 +53,8 @@ def to_magma(fin, module, magma_src, ignore_func=[]):
     cfile = []
     cfile.append('#include <cuda.h>')
     cfile.append('#include "magma_v2.h"')
-    cfile.append('#ifdef SCIPY_GPU_DEBUG')
     cfile.append('#include <stdio.h>')
-    cfile.append('#endif')
+    cfile.append('#include <stdlib.h>')
     cfile.append('typedef struct {float r,i;} complex_float;')
     cfile.append('typedef struct {double r,i;} complex_double;')
     for func in blocks[0]['body'][0]['body']:
