@@ -174,6 +174,19 @@ for prefix in []:#['s', 'd']: # segmentation fault
 
     get_time(funcname, (a, ), df)
 
+#################################################################################
+
+func = 'gesvd'
+
+for prefix in ['s', 'd']: # segmentation fault
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    n = 4096
+    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype, order='F')
+
+    get_time(funcname, (a, ), df)
+
 
 
 ################################################################################
