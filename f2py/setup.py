@@ -38,7 +38,7 @@ def configuration(parent_package='', top_path=None):
 
     config.add_extension('_flapack',
                          sources=sources,
-                         depends=['flapack_gen.pyf.src'],
+                         depends=['flapack_gen.pyf.src', 'flapack_pos_def.pyf.src', 'flapack_sym_herm.pyf.src'],
                          libraries = ['to_magma', 'gomp', ':libmagma.a', ':liblapack.a', ':librefblas.a', 'gfortran', 'cudart', 'cublas', 'cusparse'],
                          library_dirs = ['.', '../magma/magma-2.4.0/lib', '../lapack/lapack-3.8.0', '$GFORTRANDIR/lib', '$CUDADIR/lib64']
                          #depends=['flapack_gen.pyf.src',

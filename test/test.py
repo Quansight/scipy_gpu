@@ -178,11 +178,24 @@ for prefix in []:#['s', 'd']: # segmentation fault
 
 func = 'gesvd'
 
-for prefix in ['s', 'd']: # segmentation fault
+for prefix in []:#['s', 'd']: # illegal parameter value
     funcname = prefix + func
     dtype = get_dtype(funcname)
 
-    n = 4096
+    n = 8192
+    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype, order='F')
+
+    get_time(funcname, (a, ), df)
+
+#################################################################################
+
+func = 'syevd'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    n = 1024
     a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype, order='F')
 
     get_time(funcname, (a, ), df)

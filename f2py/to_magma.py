@@ -1,6 +1,13 @@
 import os
 from numpy.f2py.crackfortran import crackfortran
 
+def get_types(saved_interface):
+    lines = saved_interface.splitlines()
+    lines = [l.strip() for l in lines]
+    lines = [l[:l.find(',')] for l in lines if l and not l.startswith(('subroutine', 'end', 'call', 'threadsaf'))]
+    conv = {'integer': 'int*', 'character': 'char*', 'real': 'float*', 'double precision': 'double*'}
+    return [conv[l] for l in lines]
+
 def get_magma_types(magma_src, fname):
     with open(f'{magma_src}/{fname}.cpp') as f:
         txt = f.read()
@@ -84,7 +91,10 @@ def to_magma(fin, module, magma_src, ignore_func=[]):
             ignore = True
             print(f'{name} ignored because not found in MAGMA')
         if not ignore:
-            types = func['f2pyenhancements']['callprotoargument'].split(',')
+            if 'f2pyenhancements' in func:
+                types = func['f2pyenhancements']['callprotoargument'].split(',')
+            else:
+                types = get_types(func['saved_interface'])
             magma_types, params, convs = get_magma_types(magma_src, name)
             if len(types) != len(magma_types):
                 # not the same number of parameters, ignore this function
