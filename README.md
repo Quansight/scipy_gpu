@@ -41,8 +41,8 @@ from time import time
 
 m = 8192
 n = 100
-a = np.random.uniform(size=m*m).astype(np.float32, order='F').reshape((m, m))
-b = np.random.uniform(size=m*n).astype(np.float32, order='F').reshape((m, n))
+a = np.random.uniform(size=m*m).reshape((m, m)).astype(np.float32, order='F')
+b = np.random.uniform(size=m*n).reshape((m, n)).astype(np.float32, order='F')
 
 # sgesv solves a system of linear equations a*x=b
 # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lapack.sgesv.html
