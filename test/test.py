@@ -17,6 +17,9 @@ def get_time(funcname, args, df, keep_result=False):
     df[funcname] = {}
     for target, module in {'gpu': mm, 'cpu': lp}.items():
         func = module.__getattribute__(funcname)
+        for i, a in enumerate(args):
+            if isinstance(a, np.ndarray):
+                args[i] = np.asfortranarray(a)
         t0 = time()
         ret = func(*args)
         t1 = time()
@@ -40,10 +43,10 @@ for prefix in ['s', 'd']:
     
     m = 8192
     n = 100
-    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype, order='F')
-    b = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype, order='F')
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
+    b = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype)
     
-    get_time(funcname, (a, b), df)
+    get_time(funcname, [a, b], df)
 
 ################################################################################
 
@@ -55,9 +58,9 @@ for prefix in ['s', 'd']:
     
     m = 8192
     n = 8192
-    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype, order='F')
+    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype)
     
-    get_time(funcname, (a, ), df, keep_result=True)
+    get_time(funcname, [a], df, keep_result=True)
 
 ################################################################################
 
@@ -69,10 +72,10 @@ for prefix in []:#['s', 'd']: # not executed on the GPU
     
     n = 8192
     nrhs = 100
-    b = np.ones((m, nrhs), dtype=dtype, order='F')
+    b = np.ones((n, nrhs), dtype=dtype)
     lu, piv, info = df[prefix + 'getrf']['ret']
     
-    get_time(funcname, (lu, piv, b), df)
+    get_time(funcname, [lu, piv, b], df)
 
 ################################################################################
 
@@ -84,7 +87,9 @@ for prefix in []:#['s', 'd']: # not executed on the GPU
     
     lu, piv, info = df[prefix + 'getrf']['ret']
     
-    get_time(funcname, (lu, piv), df)
+    get_time(funcname, [lu, piv], df)
+
+    del df[prefix + 'getrf']['ret']
 
 ################################################################################
 
@@ -96,15 +101,15 @@ for prefix in ['s', 'd']:
 
     m = 8192
     n = 100
-    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype, order='F')
-    b = np.ones((m, n), dtype=dtype, order='F')
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
+    b = np.ones((m, n), dtype=dtype)
     alpha = 1.
     if dtype == np.float32:
         c = bl.sgemm(alpha, a, b)
     elif dtype == np.float64:
         c = bl.dgemm(alpha, a, b)
 
-    get_time(funcname, (a, c), df)
+    get_time(funcname, [a, c], df)
 
 ################################################################################
 
@@ -115,9 +120,9 @@ for prefix in ['s', 'd']:
     dtype = get_dtype(funcname)
     
     m = 8192
-    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype, order='F')
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
 
-    get_time(funcname, (a, ), df, keep_result=True)
+    get_time(funcname, [a], df, keep_result=True)
 
 ################################################################################
 
@@ -129,7 +134,9 @@ for prefix in ['s', 'd']:
     
     c, info = df[prefix + 'potrf']['ret']
 
-    get_time(funcname, (c, ), df)
+    get_time(funcname, [c], df)
+
+    del df[prefix + 'potrf']['ret']
 
 ################################################################################
 
@@ -142,10 +149,10 @@ for prefix in []:#['s', 'd']: # illegal parameter value
     m = 8192
     n = 8192
     nrhs = 100
-    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype, order='F')
-    b = np.random.uniform(size=m*nrhs).reshape((m, nrhs)).astype(dtype, order='F')
+    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype)
+    b = np.random.uniform(size=m*nrhs).reshape((m, nrhs)).astype(dtype)
 
-    get_time(funcname, (a, b), df)
+    get_time(funcname, [a, b], df)
 
 ################################################################################
 
@@ -157,9 +164,9 @@ for prefix in []:#['s', 'd']: # illegal parameter value
     
     m = 4096
     n = 4096
-    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype, order='F')
+    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype)
 
-    get_time(funcname, (a, ), df)
+    get_time(funcname, [a], df)
 
 ################################################################################
 
@@ -170,9 +177,9 @@ for prefix in []:#['s', 'd']: # segmentation fault
     dtype = get_dtype(funcname)
     
     n = 1024
-    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype, order='F')
+    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype)
 
-    get_time(funcname, (a, ), df)
+    get_time(funcname, [a], df)
 
 #################################################################################
 
@@ -183,9 +190,9 @@ for prefix in []:#['s', 'd']: # illegal parameter value
     dtype = get_dtype(funcname)
 
     n = 8192
-    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype, order='F')
+    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype)
 
-    get_time(funcname, (a, ), df)
+    get_time(funcname, [a], df)
 
 #################################################################################
 
@@ -196,13 +203,122 @@ for prefix in ['s', 'd']:
     dtype = get_dtype(funcname)
 
     n = 1024
-    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype, order='F')
+    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype)
 
-    get_time(funcname, (a, ), df)
+    get_time(funcname, [a], df)
 
+#################################################################################
 
+func = 'gehrd'
 
-################################################################################
+for prefix in []:#['s', 'd']: # segmentation fault
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    n = 2048
+    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype)
+
+    get_time(funcname, [a], df)
+
+#################################################################################
+
+func = 'geqp3'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    m = 4096
+    n = 4096
+    a = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype)
+
+    get_time(funcname, [a], df)
+
+#################################################################################
+
+func = 'sysv'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    m = 8192
+    n = 100
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
+    b = np.random.uniform(size=m*n).reshape((m, n)).astype(dtype)
+
+    get_time(funcname, [a, b], df)
+
+#################################################################################
+
+func = 'gesdd'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    m = 4096
+    n = 100
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
+
+    get_time(funcname, [a], df)
+
+#################################################################################
+
+func = 'sygst'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    m = 4096
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
+    b = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
+
+    get_time(funcname, [a, b], df)
+
+#################################################################################
+
+func = 'sygvd'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    m = 4096
+    a = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
+    b = np.random.uniform(size=m*m).reshape((m, m)).astype(dtype)
+
+    get_time(funcname, [a, b], df)
+
+#################################################################################
+
+func = 'sytrd'
+
+for prefix in []:#['s', 'd']: # illegal parameter value
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    n = 8192
+    lda = 8192
+    a = np.random.uniform(size=lda*n).reshape((lda, n)).astype(dtype)
+
+    get_time(funcname, [a], df)
+
+#################################################################################
+
+func = 'sytrf'
+
+for prefix in ['s', 'd']:
+    funcname = prefix + func
+    dtype = get_dtype(funcname)
+
+    n = 8192
+    a = np.random.uniform(size=n*n).reshape((n, n)).astype(dtype)
+
+    get_time(funcname, [a], df)
+
+#################################################################################
 
 index = list(df.keys())
 gpu_time = [df[func]['gpu'] for func in df]
